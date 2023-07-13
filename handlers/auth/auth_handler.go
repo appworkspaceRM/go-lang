@@ -3,8 +3,11 @@ package handlerauth
 import (
 	dtoauth "landtick_backend/dto/auth"
 	dtoressult "landtick_backend/dto/ressult"
+	modeluser "landtick_backend/models/user"
+	pkgbcrypt "landtick_backend/pkg/bcrypt"
 	repositoryauth "landtick_backend/repositories/auth"
 	"net/http"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
@@ -39,5 +42,39 @@ func (h *handlerAuth)Register(c echo.Context) error  {
 			Message: err.Error(),
 		})
 	}
-	return nil
+
+	password, err := pkgbcrypt.HashingPassword(request.Password)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, dtoressult.ErrorResult{
+			Status: "Error",
+			Message: err.Error(),
+		})
+	}
+
+	user := modeluser.User{
+		FullName: request.FullName,
+		UserName: request.UserName,
+		Email: request.Email,
+		Password: password,
+		Role: "customer",
+		PhoneNumber: request.PhoneNumber,
+		Gender: request.Gender,
+		Address: request.Address,
+		CreatedAd: time.Now(),
+		UpdateAd: time.Now(),
+	}
+
+	register, err := h.AuthRepository.Register(user)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, dtoressult.ErrorResult{
+			Status: "Error",
+			Message: err.Error(),
+		})
+	}	
+	return c.JSON(http.StatusOK, dtoressult.SuccessResult{
+		Stattus: "success",
+		Data: JsonAuth{
+			DataAuth: register,
+		},
+	})
 }

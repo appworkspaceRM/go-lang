@@ -5,7 +5,6 @@ type AuthRequest struct {
 	UserName    string `json:"username" form:"username" validate:"required"`
 	Email       string `json:"email" form:"email" validate:"required"`
 	Password    string `json:"password" form:"password" validate:"required"`
-	Role        string `json:"-" form:"role" validate:"required"`
 	PhoneNumber string `json:"phoneNumber" form:"phone_number" validate:"required"`
 	Gender      string `json:"gender" form:"gender" validate:"required"`
 	Address     string `json:"address" form:"address" validate:"required"`
